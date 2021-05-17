@@ -1,0 +1,6 @@
+applicationType: grpc
+defaultPackage: br.com.zup
+testFramework: junit
+sourceLanguage: kotlin
+buildTool: gradle
+features: [annotation-api, app-name, data, data-jpa, gradle, grpc, hibernate-validator, jdbc-hikari, junit, kotlin, kotlin-application, logback, mockito, mysql, readme, security, security-annotations, shade, testcontainers, yaml]
