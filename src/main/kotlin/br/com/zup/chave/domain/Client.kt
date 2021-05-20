@@ -14,4 +14,5 @@ class Client(@field:Column(nullable = false) val uuid: String,
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id:Long? = null
+        private set
 }

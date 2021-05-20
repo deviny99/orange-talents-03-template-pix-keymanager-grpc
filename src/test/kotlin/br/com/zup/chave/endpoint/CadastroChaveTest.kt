@@ -18,6 +18,7 @@ import io.micronaut.context.annotation.Factory
 import io.micronaut.grpc.annotation.GrpcChannel
 import io.micronaut.grpc.server.GrpcServerChannel
 import io.micronaut.test.annotation.MockBean
+import io.micronaut.test.annotation.TransactionMode
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
@@ -25,7 +26,8 @@ import org.junit.jupiter.api.assertThrows
 import org.mockito.Mockito
 import javax.inject.Singleton
 
-@MicronautTest(transactional = false)
+@MicronautTest(transactional = false,
+    transactionMode = TransactionMode.SINGLE_TRANSACTION)
 class CadastroChaveTest(
     private val grpcClient : KeyManagerServiceGrpc.KeyManagerServiceBlockingStub,
     private val itauClient : ItauClient,
@@ -48,10 +50,10 @@ class CadastroChaveTest(
         this.mockarConsultaCliente()
 
         val respose = this.grpcClient.cadastrarChave(ChaveRequest.newBuilder()
-                .setIdClient(idClienteValido)
-                .setChave(cpfValido)
-                .setTipo(TipoChave.CPF)
-                .setTipoConta(TipoConta.CONTA_CORRENTE)
+            .setIdClient(idClienteValido)
+            .setChave(cpfValido)
+            .setTipo(TipoChave.CPF)
+            .setTipoConta(TipoConta.CONTA_CORRENTE)
             .build())
 
         Assertions.assertNotNull(respose.id)
@@ -142,7 +144,7 @@ class CadastroChaveTest(
             Conta("123","213123")),
             celularValido,TipoChave.CELULAR,TipoConta.CONTA_CORRENTE))
 
-       this.mockarConsultaCliente()
+        this.mockarConsultaCliente()
 
         val exception = assertThrows<StatusRuntimeException> {
             this.grpcClient.cadastrarChave(ChaveRequest.newBuilder()

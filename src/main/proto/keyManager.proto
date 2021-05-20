@@ -10,6 +10,7 @@ import "google/protobuf/any.proto";
 
 service KeyManagerService {
   rpc cadastrarChave (ChaveRequest) returns (ChaveResponse) {}
+  rpc removerChave (ClienteChaveRequest) returns (ChaveRemovidaResponse) {}
 }
 
 enum TipoChave{
@@ -33,4 +34,13 @@ message ChaveRequest {
 
 message ChaveResponse {
   string id = 1;
+}
+
+message ClienteChaveRequest{
+  string idClient = 1;
+  string chave = 2;
+}
+
+message ChaveRemovidaResponse{
+  string message = 1;
 }

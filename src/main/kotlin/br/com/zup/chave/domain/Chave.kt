@@ -20,6 +20,7 @@ class Chave(@field:ManyToOne(fetch = FetchType.EAGER,cascade = [CascadeType.PERS
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id:Long? = null
+    private set
     @Column(nullable = false, updatable = false, unique = true)
     val uuid:String = UUID.randomUUID().toString()
 

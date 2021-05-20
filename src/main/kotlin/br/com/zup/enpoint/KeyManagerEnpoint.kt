@@ -1,8 +1,6 @@
 package br.com.zup.enpoint
 
-import br.com.zup.ChaveRequest
-import br.com.zup.ChaveResponse
-import br.com.zup.KeyManagerServiceGrpc
+import br.com.zup.*
 import br.com.zup.chave.repository.ChaveRepository
 import br.com.zup.chave.repository.ClientRepository
 import br.com.zup.chave.validation.PixValidation
@@ -20,7 +18,7 @@ import javax.transaction.Transactional
 
 @Singleton
 @ErrorHandler
-class KeyManagerEnpoint(
+open class KeyManagerEnpoint(
     private val chaveRepository: ChaveRepository,
     @field:Inject private val validations:Set<PixValidation>,
     private val itauClient: ItauClient,
@@ -54,8 +52,21 @@ class KeyManagerEnpoint(
         responseObserver?.onCompleted()
     }
 
+    @Transactional
+    override fun removerChave(request: ClienteChaveRequest, responseObserver: StreamObserver<ChaveRemovidaResponse>?) {
 
+        request.notNulls()
+        val pix = request.retornarChave(this.chaveRepository)
+        request.verificaDonoChave(pix)
 
+        this.chaveRepository.deleteById(pix.id)
 
+        responseObserver?.onNext(ChaveRemovidaResponse
+            .newBuilder()
+            .setMessage("Chave removida com sucesso")
+            .build())
+        responseObserver?.onCompleted()
+
+    }
 
 }

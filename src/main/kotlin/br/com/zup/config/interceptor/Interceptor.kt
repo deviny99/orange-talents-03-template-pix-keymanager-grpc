@@ -10,6 +10,7 @@ import io.grpc.stub.StreamObserver
 import io.micronaut.aop.InterceptorBean
 import io.micronaut.aop.MethodInterceptor
 import io.micronaut.aop.MethodInvocationContext
+import io.micronaut.http.client.exceptions.HttpClientException
 import io.micronaut.http.client.exceptions.HttpClientResponseException
 import java.lang.Exception
 import java.nio.Buffer
@@ -23,10 +24,17 @@ class Interceptor : MethodInterceptor<KeyManagerEnpoint,Any> {
         try
         {
              context.proceed()
-        }catch (exception:HttpClientResponseException){
+        }
+        catch (exception:HttpClientResponseException){
 
             val response = context.parameterValues[1] as StreamObserver<*>
-            response.onError(Status.INVALID_ARGUMENT.withDescription(exception.localizedMessage)
+            response.onError(Status.INVALID_ARGUMENT.withDescription("Erro na requisição")
+                .asRuntimeException())
+        }
+        catch (exception:HttpClientException){
+
+            val response = context.parameterValues[1] as StreamObserver<*>
+            response.onError(Status.INVALID_ARGUMENT.withDescription("Erro na requisição")
                 .asRuntimeException())
         }
         catch (exception: GrpcExceptionRuntime){
