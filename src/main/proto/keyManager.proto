@@ -3,18 +3,34 @@ syntax = "proto3";
 option java_multiple_files = true;
 option java_package = "br.com.zup";
 option java_outer_classname = "KeyManager";
-option objc_class_prefix = "HLW";
 
 package br.com.zup;
 
+import "google/protobuf/any.proto";
+
 service KeyManagerService {
-  rpc send (KeyManagerRequest) returns (KeyManagerReply) {}
+  rpc cadastrarChave (ChaveRequest) returns (ChaveResponse) {}
 }
 
-message KeyManagerRequest {
-  string name = 1;
+enum TipoChave{
+  ALEATORIO = 0;
+  CELULAR = 1;
+  CPF = 2;
+  EMAIL = 3;
 }
 
-message KeyManagerReply {
-  string message = 1;
+enum TipoConta{
+  CONTA_CORRENTE = 0;
+  CONTA_POUPANCA = 1;
+}
+
+message ChaveRequest {
+  string idClient = 1;
+  TipoChave tipo = 2;
+  string chave = 3;
+  TipoConta tipoConta = 4;
+}
+
+message ChaveResponse {
+  string id = 1;
 }
