@@ -9,7 +9,7 @@ open class CpfPixValidation : PixValidation {
     override val field: String
         get() = TipoChave.CPF.name.trim().toLowerCase()
     override val message: String
-        get() = "a chave ${this.field} está no formato invalido.".trim().toLowerCase()
+        get() = "a chave ${this.field} esta no formato invalido.".trim().toLowerCase()
 
 
     override fun validate(chave:String,tipoChave: TipoChave): Boolean {

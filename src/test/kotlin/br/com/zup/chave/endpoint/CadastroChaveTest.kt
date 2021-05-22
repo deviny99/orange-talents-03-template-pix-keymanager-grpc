@@ -1,135 +1,123 @@
 package br.com.zup.chave.endpoint
 
 import br.com.zup.ChaveRequest
-import br.com.zup.KeyManagerServiceGrpc
-import br.com.zup.TipoChave
+import br.com.zup.KeyManagerRegistryGrpc
 import br.com.zup.TipoConta
 import br.com.zup.chave.domain.Chave
 import br.com.zup.chave.domain.Client
 import br.com.zup.chave.domain.Conta
 import br.com.zup.chave.domain.Instituicao
+import br.com.zup.chave.endpoint.databuild.ChaveRequestBuilder
 import br.com.zup.chave.repository.ChaveRepository
+import br.com.zup.proxys.bcb.BcbClient
+import br.com.zup.proxys.bcb.dto.request.CreatePixKeyRequestProxy
+import br.com.zup.proxys.bcb.dto.response.CreatePixKeyResponse
 import br.com.zup.proxys.itau.ClienteProxyResponse
 import br.com.zup.proxys.itau.ItauClient
+import com.google.rpc.BadRequest
 import io.grpc.ManagedChannel
 import io.grpc.Status
 import io.grpc.StatusRuntimeException
+import io.grpc.protobuf.StatusProto
 import io.micronaut.context.annotation.Factory
 import io.micronaut.grpc.annotation.GrpcChannel
 import io.micronaut.grpc.server.GrpcServerChannel
 import io.micronaut.test.annotation.MockBean
-import io.micronaut.test.annotation.TransactionMode
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
 import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.mockito.Mockito
+import javax.inject.Inject
 import javax.inject.Singleton
+import org.hamcrest.MatcherAssert.assertThat
+import org.hamcrest.Matchers.containsInAnyOrder
+import java.time.LocalDate
+import java.time.LocalDateTime
 
-@MicronautTest(transactional = false,
-    transactionMode = TransactionMode.SINGLE_TRANSACTION)
-class CadastroChaveTest(
-    private val grpcClient : KeyManagerServiceGrpc.KeyManagerServiceBlockingStub,
-    private val itauClient : ItauClient,
-    private val repository: ChaveRepository) {
+@MicronautTest(transactional = false)
+internal class CadastroChaveTest(
+    private val grpcClient : KeyManagerRegistryGrpc.KeyManagerRegistryBlockingStub) {
 
     private val idClienteValido = "2b62dad8-b8a5-11eb-8529-0242ac130003"
-    private val idClienteInvalido = "1"
     private val cpfValido = "596.265.190-10"
-    private val cpfInvalido = "abc.123.dfg-45"
-    private val emailValido = "email@email.com"
-    private val emailInvalido = "email"
-    private val celularValido = "+55(19)99999-9999"
-    private val celularInvalido = "(19)99999-9999"
+
+
+    @field:Inject
+    lateinit var  itauClient : ItauClient
+    @field:Inject
+    lateinit var bcbClient: BcbClient
+
+    @field:Inject
+    lateinit var repository: ChaveRepository
+
+    @MockBean(BcbClient::class)
+    fun bcbClient():BcbClient?{
+        return Mockito.mock(BcbClient::class.java)
+    }
+
+    @MockBean(ItauClient::class)
+    fun itauClient(): ItauClient? {
+        return Mockito.mock(ItauClient::class.java)
+    }
+
+    @Factory
+    class Clients{
+        @Singleton
+        fun blockingStub(@GrpcChannel(GrpcServerChannel.NAME) channel: ManagedChannel):
+                KeyManagerRegistryGrpc.KeyManagerRegistryBlockingStub?{
+            return KeyManagerRegistryGrpc.newBlockingStub(channel)
+        }
+    }
+
+    @BeforeEach
+    fun setup(){
+        this.repository.deleteAll()
+    }
 
     @Test
     fun `Deve cadastrar chave com cpf`(){
 
-        this.repository.deleteAll()
-
-        this.mockarConsultaCliente()
-
-        val respose = this.grpcClient.cadastrarChave(ChaveRequest.newBuilder()
-            .setIdClient(idClienteValido)
-            .setChave(cpfValido)
-            .setTipo(TipoChave.CPF)
-            .setTipoConta(TipoConta.CONTA_CORRENTE)
-            .build())
-
+        this.consultaERPComSucessoMock()
+        this.registrarPixBcbMock()
+        val respose = this.grpcClient.cadastrarChave(ChaveRequestBuilder.requestCpfValido())
         Assertions.assertNotNull(respose.id)
         Assertions.assertEquals(1, repository.count())
 
     }
-
 
     @Test
     fun `Deve cadastrar chave com email`(){
 
-        this.repository.deleteAll()
-
-        this.mockarConsultaCliente()
-
-        val respose = this.grpcClient.cadastrarChave(ChaveRequest.newBuilder()
-            .setIdClient(idClienteValido)
-            .setChave(emailValido)
-            .setTipo(TipoChave.EMAIL)
-            .setTipoConta(TipoConta.CONTA_CORRENTE)
-            .build())
-
+        this.consultaERPComSucessoMock()
+        this.registrarPixBcbMock()
+        val respose = this.grpcClient.cadastrarChave(ChaveRequestBuilder.requestEmailValido())
         Assertions.assertNotNull(respose.id)
         Assertions.assertEquals(1, repository.count())
 
     }
+
 
     @Test
     fun `Deve cadastrar chave aleatoria`(){
 
-        this.repository.deleteAll()
+        this.consultaERPComSucessoMock()
+        this.registrarPixBcbMock()
 
-        this.mockarConsultaCliente()
-
-        val respose = this.grpcClient.cadastrarChave(ChaveRequest.newBuilder()
-            .setIdClient(idClienteValido)
-            .setChave("")
-            .setTipo(TipoChave.ALEATORIO)
-            .setTipoConta(TipoConta.CONTA_CORRENTE)
-            .build())
+        val respose = this.grpcClient.cadastrarChave(ChaveRequestBuilder.requestChaveAleatorio())
 
         Assertions.assertNotNull(respose.id)
         Assertions.assertEquals(1, repository.count())
-
-    }
-
-    @Test
-    fun `Deve cadastar com chave nula ou vazia portanto que seja do tipo aleatorio`(){
-
-        this.repository.deleteAll()
-
-        this.mockarConsultaCliente()
-
-        val response =   this.grpcClient.cadastrarChave(ChaveRequest.newBuilder()
-            .setIdClient(idClienteValido)
-            .setTipo(TipoChave.ALEATORIO)
-            .setTipoConta(TipoConta.CONTA_CORRENTE)
-            .build())
-
-        Assertions.assertNotNull(response.id)
 
     }
 
     @Test
     fun `Deve cadastrar chave com celular`(){
 
-        this.repository.deleteAll()
-
-        this.mockarConsultaCliente()
-
-        val respose = this.grpcClient.cadastrarChave(ChaveRequest.newBuilder()
-            .setIdClient(idClienteValido)
-            .setChave(celularValido)
-            .setTipo(TipoChave.CELULAR)
-            .setTipoConta(TipoConta.CONTA_CORRENTE)
-            .build())
+        this.consultaERPComSucessoMock()
+        this.registrarPixBcbMock()
+        val respose = this.grpcClient.cadastrarChave(ChaveRequestBuilder.requestCelularValido())
 
         Assertions.assertNotNull(respose.id)
         Assertions.assertEquals(1, repository.count())
@@ -137,27 +125,46 @@ class CadastroChaveTest(
     }
 
     @Test
-    fun `Nao deve cadastrar chave ja existente`(){
+    fun `Deve cadastrar chave do tipo aleatorio nao nulo com valor ja existente`(){
+
+        val request = ChaveRequestBuilder.requestTipoAleatorioNaoNuloJaExistente()
 
         this.repository.save(Chave(Client(idClienteValido, "Cliente",cpfValido,
             Instituicao("ITAU","939249"),
             Conta("123","213123")),
-            celularValido,TipoChave.CELULAR,TipoConta.CONTA_CORRENTE))
+            request.chave,request.tipo,request.tipoConta))
 
-        this.mockarConsultaCliente()
+        this.consultaERPComSucessoMock()
+        this.registrarPixBcbMock()
+
+        val respose = this.grpcClient.cadastrarChave(request)
+
+        Assertions.assertNotNull(respose.id)
+        Assertions.assertEquals(2, repository.count())
+
+    }
+
+    @Test
+    fun `Nao deve cadastrar chave ja existente`(){
+
+        val request = ChaveRequestBuilder.requestCelularValido()
+
+        this.repository.save(Chave(Client(idClienteValido, "Cliente",cpfValido,
+            Instituicao("ITAU","939249"),
+            Conta("123","213123")),
+            request.chave,request.tipo,request.tipoConta))
+
+        this.consultaERPComSucessoMock()
+        this.registrarPixBcbMock()
 
         val exception = assertThrows<StatusRuntimeException> {
-            this.grpcClient.cadastrarChave(ChaveRequest.newBuilder()
-                .setIdClient(idClienteValido)
-                .setChave(celularValido)
-                .setTipo(TipoChave.CELULAR)
-                .setTipoConta(TipoConta.CONTA_CORRENTE)
-                .build())
+            this.grpcClient.cadastrarChave(request)
         }
 
         with(exception)
         {
             Assertions.assertEquals(Status.ALREADY_EXISTS.code,exception.status.code)
+
         }
 
     }
@@ -166,25 +173,44 @@ class CadastroChaveTest(
     @Test
     fun `Nao deve cadastrar chave do tipo cpf do formato invalido`(){
 
-        this.repository.save(Chave(Client(idClienteValido, "Cliente",cpfValido,
-            Instituicao("ITAU","939249"),
-            Conta("123","213123")),
-            celularValido,TipoChave.CPF,TipoConta.CONTA_CORRENTE))
+        val request = ChaveRequestBuilder.requestCpfInvalido()
 
-        this.mockarConsultaCliente()
+        this.consultaERPComSucessoMock()
+        this.registrarPixBcbMock()
 
         val exception = assertThrows<StatusRuntimeException> {
-            this.grpcClient.cadastrarChave(ChaveRequest.newBuilder()
-                .setIdClient(idClienteValido)
-                .setChave(cpfInvalido)
-                .setTipo(TipoChave.CPF)
-                .setTipoConta(TipoConta.CONTA_CORRENTE)
-                .build())
+            this.grpcClient.cadastrarChave(request)
         }
 
         with(exception)
         {
             Assertions.assertEquals(Status.INVALID_ARGUMENT.code,exception.status.code)
+            assertThat(violations(), containsInAnyOrder(
+                Pair("cpf", "a chave cpf esta no formato invalido.")
+            ))
+        }
+
+    }
+
+    @Test
+    fun `Nao deve cadastrar chave do tipo email do formato invalido`(){
+
+        val request = ChaveRequestBuilder.requestEmailInvalido()
+
+
+        this.consultaERPComSucessoMock()
+        this.registrarPixBcbMock()
+
+        val exception = assertThrows<StatusRuntimeException> {
+            this.grpcClient.cadastrarChave(request)
+        }
+
+        with(exception)
+        {
+            Assertions.assertEquals(Status.INVALID_ARGUMENT.code,exception.status.code)
+            assertThat(violations(), containsInAnyOrder(
+                Pair("email", "a chave do tipo email esta no formato invalido.")
+            ))
         }
 
     }
@@ -192,17 +218,11 @@ class CadastroChaveTest(
     @Test
     fun `Nao deve cadastrar chave com mais de 77 caracteres`(){
 
-        this.repository.deleteAll()
-
-        this.mockarConsultaCliente()
+        this.consultaERPComSucessoMock()
+        this.registrarPixBcbMock()
 
         val exception = assertThrows<StatusRuntimeException> {
-            this.grpcClient.cadastrarChave(ChaveRequest.newBuilder()
-                .setIdClient(idClienteValido)
-                .setChave(this.chaveLimiteCaracteres())
-                .setTipo(TipoChave.EMAIL)
-                .setTipoConta(TipoConta.CONTA_CORRENTE)
-                .build())
+            this.grpcClient.cadastrarChave(ChaveRequestBuilder.requestChaveComTamanhoInvalido())
         }
 
         with(exception)
@@ -214,22 +234,18 @@ class CadastroChaveTest(
     @Test
     fun `Nao deve cadastrar chave vazia`(){
 
-        this.repository.deleteAll()
-
-        this.mockarConsultaCliente()
+        this.consultaERPComSucessoMock()
+        this.registrarPixBcbMock()
 
         val exception = assertThrows<StatusRuntimeException> {
-            this.grpcClient.cadastrarChave(ChaveRequest.newBuilder()
-                .setIdClient(idClienteValido)
-                .setChave("")
-                .setTipo(TipoChave.CELULAR)
-                .setTipoConta(TipoConta.CONTA_CORRENTE)
-                .build())
+            this.grpcClient.cadastrarChave(ChaveRequestBuilder.requestChaveVaziaDoTipoNaoAleatorio())
         }
 
         with(exception)
         {
+
             Assertions.assertEquals(Status.INVALID_ARGUMENT.code,exception.status.code)
+
         }
 
     }
@@ -237,104 +253,84 @@ class CadastroChaveTest(
     @Test
     fun `Nao deve cadastrar chave de tipos errados`(){
 
-        this.repository.deleteAll()
-
-        this.mockarConsultaCliente()
+        this.consultaERPComSucessoMock()
+        this.registrarPixBcbMock()
 
         val exception = assertThrows<StatusRuntimeException> {
-            this.grpcClient.cadastrarChave(ChaveRequest.newBuilder()
-                .setIdClient("1")
-                .setChave(celularValido)
-                .setTipo(TipoChave.EMAIL)
-                .setTipoConta(TipoConta.CONTA_CORRENTE)
-                .build())
+            this.grpcClient.cadastrarChave(ChaveRequestBuilder.requestChaveDeTipoInvalido())
         }
 
         with(exception)
         {
+
             Assertions.assertEquals(Status.INVALID_ARGUMENT.code,exception.status.code)
+            assertThat(violations(), containsInAnyOrder(
+                Pair("celular", "a chave celular esta no formato invalido.")
+            ))
         }
     }
 
     @Test
     fun `Nao deve cadastrar chave que o identificador nao pertence a uma conta`(){
 
-        this.repository.deleteAll()
-
-        this.mockarConsultaClientNotFound()
+        this.consultaERPComNotFoundMock()
+        this.registrarPixBcbMock()
 
         val exception = assertThrows<StatusRuntimeException> {
-            this.grpcClient.cadastrarChave(ChaveRequest.newBuilder()
-                .setIdClient(idClienteValido)
-                .setChave(cpfValido)
-                .setTipo(TipoChave.CPF)
-                .setTipoConta(TipoConta.CONTA_CORRENTE)
-                .build())
+            this.grpcClient.cadastrarChave(ChaveRequestBuilder.requestChaveAleatorio())
         }
 
         with(exception)
         {
             Assertions.assertEquals(Status.NOT_FOUND.code,exception.status.code)
+            Assertions.assertEquals("NOT_FOUND: Cliente ou Conta invalido",exception.localizedMessage)
         }
     }
 
     @Test
     fun `Nao deve cadastrar chave com o id do cliente nulo ou vazio`(){
-        this.repository.deleteAll()
 
-        this.mockarConsultaCliente()
+        this.consultaERPComSucessoMock()
+        this.registrarPixBcbMock()
 
         val exception = assertThrows<StatusRuntimeException> {
-            this.grpcClient.cadastrarChave(ChaveRequest.newBuilder()
-                .setIdClient("")
-                .setChave(cpfValido)
-                .setTipo(TipoChave.CPF)
-                .setTipoConta(TipoConta.CONTA_CORRENTE)
-                .build())
+            this.grpcClient.cadastrarChave(ChaveRequestBuilder.requestIdClientNulo())
         }
 
         with(exception)
         {
             Assertions.assertEquals(Status.INVALID_ARGUMENT.code,exception.status.code)
+            Assertions.assertEquals("INVALID_ARGUMENT: O id do cliente não pode ser nulo",exception.localizedMessage)
         }
     }
 
     @Test
     fun `Nao deve cadastrar chave caso o cliente nao possua aquele tipo de conta vinculada ao banco`(){
-        this.repository.deleteAll()
 
-        this.mockarConsultaClientNotFound()
+        this.consultaERPComNotFoundMock()
+        this.registrarPixBcbMock()
 
         val exception = assertThrows<StatusRuntimeException> {
-            this.grpcClient.cadastrarChave(ChaveRequest.newBuilder()
-                .setIdClient(idClienteValido)
-                .setChave(cpfValido)
-                .setTipo(TipoChave.CPF)
-                .setTipoConta(TipoConta.CONTA_POUPANCA)
-                .build())
+            this.grpcClient.cadastrarChave(ChaveRequestBuilder.requestChaveAleatorio())
         }
 
         with(exception)
         {
-            println(exception.message)
+
             Assertions.assertEquals(Status.NOT_FOUND.code,exception.status.code)
+            Assertions.assertEquals("NOT_FOUND: Cliente ou Conta invalido",exception.localizedMessage)
         }
     }
+
 
     @Test
     fun `Nao deve cadastrar chave com o id do cliente do formato invalido`(){
 
-        this.repository.deleteAll()
-
-        this.mockarConsultaCliente()
+        this.consultaERPComSucessoMock()
+        this.registrarPixBcbMock()
 
         val exception = assertThrows<StatusRuntimeException> {
-            this.grpcClient.cadastrarChave(ChaveRequest.newBuilder()
-                .setIdClient(idClienteInvalido)
-                .setChave(cpfValido)
-                .setTipo(TipoChave.CPF)
-                .setTipoConta(TipoConta.CONTA_CORRENTE)
-                .build())
+            this.grpcClient.cadastrarChave(ChaveRequestBuilder.requestIdClientFormatoInvalido())
         }
 
         with(exception)
@@ -346,44 +342,54 @@ class CadastroChaveTest(
 
 
 
-
-    @Factory
-    class Clients{
-
-        @Singleton
-        fun blockingStub(@GrpcChannel(GrpcServerChannel.NAME) channel: ManagedChannel):KeyManagerServiceGrpc.KeyManagerServiceBlockingStub?{
-            return KeyManagerServiceGrpc.newBlockingStub(channel)
-        }
-
+    private fun cliente(chaveRequest: ChaveRequest):Client{
+        return Client(chaveRequest.idClient,"fulano",cpfValido,
+            Instituicao("ITAU","123"),Conta("0001","212233"))
     }
 
-    private fun mockarConsultaCliente(){
-        Mockito.`when`(itauClient.consultarClient(idClienteValido,TipoConta.CONTA_CORRENTE)).thenReturn(
-            ClienteProxyResponse(titular = ClienteProxyResponse.TitularProxyDto(idClienteValido,
-                nome="fulano",
-                cpf=cpfValido,),
-                tipo = TipoConta.CONTA_CORRENTE,
-                agencia = "0001",
-                numero = "12345678",
-                instituicao = ClienteProxyResponse.InstituicaoProxyDTO(nome = "ITAU", ispb = "2182139"))
-        )
+    private fun clienteResponse():ClienteProxyResponse{
+        return ClienteProxyResponse(titular = ClienteProxyResponse.TitularProxyDto(idClienteValido,
+            nome="fulano",
+            cpf=cpfValido),
+            tipo = TipoConta.CONTA_CORRENTE,
+            agencia = "0001",
+            numero = "12345678",
+            instituicao = ClienteProxyResponse.InstituicaoProxyDTO(nome = "ITAU", ispb = "2182139"))
     }
 
-    private fun mockarConsultaClientNotFound(){
-        Mockito.`when`(itauClient.consultarClient(idClienteInvalido,TipoConta.CONTA_POUPANCA)).thenReturn(null)
+    private fun <T> any(type: Class<T>): T = Mockito.any(type)
+    private fun <T> any(): T = Mockito.any()
+
+    private fun StatusRuntimeException.violations(): List<Pair<String, String>>? {
+        val details = StatusProto.fromThrowable(this)
+            ?.detailsList?.get(0)!!
+            .unpack(BadRequest::class.java)
+
+        return details.fieldViolationsList
+            .map { it.field to it.description }
     }
 
-    @MockBean(ItauClient::class)
-    fun itauClient(): ItauClient {
-        return Mockito.mock(ItauClient::class.java)
+
+    private fun consultaERPComNotFoundMock(){
+        Mockito.`when`(itauClient.consultarClient(any(),any())).thenReturn(null)
     }
 
-    private fun chaveLimiteCaracteres():String{
-        var sb = StringBuffer()
-        for (i:Int in 0..77){
-            sb.append("1")
-        }
-        return sb.toString()
+    private fun consultaERPComSucessoMock(){
+        Mockito.`when`(itauClient.consultarClient(any(),any())).thenReturn(clienteResponse())
     }
 
+    private fun registrarPixBcbMock(){
+        Mockito.`when`(bcbClient.cadastrarChavePix(any(CreatePixKeyRequestProxy::class.java)))
+            .thenReturn(responsePix())
+    }
+
+    private fun naoRegistrarPixBcbMock(){
+        Mockito.`when`(bcbClient.cadastrarChavePix(any(CreatePixKeyRequestProxy::class.java)))
+            .thenReturn(null)
+    }
+
+
+    fun responsePix(): CreatePixKeyResponse {
+        return CreatePixKeyResponse("823482",LocalDateTime.now())
+    }
 }

@@ -19,7 +19,7 @@ class ChaveDomainTest(private val chaveRepository: ChaveRepository) {
         try {
             val chaveDomain = Chave(Client(UUID.randomUUID().toString(),"Fulano","089.723.170-80",
                 Instituicao("ITAU","234234"), Conta("12312","123123")),
-                null,
+                "",
                 TipoChave.ALEATORIO,
                 TipoConta.CONTA_CORRENTE
             )
@@ -55,28 +55,13 @@ class ChaveDomainTest(private val chaveRepository: ChaveRepository) {
     }
 
     @Test
-    fun `Nao deve receber chave nula caso nao seja uma chave do tipo aleatoria`(){
-        try {
-            Chave(Client(UUID.randomUUID().toString(),"Fulano","089.723.170-80",
-                Instituicao("ITAU","234234"), Conta("12312","123123")),
-                "",
-                TipoChave.EMAIL,
-                TipoConta.CONTA_CORRENTE
-            )
-            fail("")
-        }catch (ex:Exception){
-            Assertions.assertNotNull(ex)
-        }
-    }
-
-    @Test
     fun `Deve persistir objeto de dominio de chave com chave aleatoria`(){
 
         this.chaveRepository.deleteAll()
 
         val chavePrePersiste = Chave(Client(UUID.randomUUID().toString(),"Fulano","089.723.170-80",
             Instituicao("ITAU","234234"), Conta("12312","123123")),
-            null,
+            "",
             TipoChave.ALEATORIO,
             TipoConta.CONTA_CORRENTE
         )
@@ -85,7 +70,6 @@ class ChaveDomainTest(private val chaveRepository: ChaveRepository) {
         Assertions.assertNotNull(chavePrePersiste.client)
         Assertions.assertNull(chavePrePersiste.id)
         Assertions.assertNotNull(chavePrePersiste.keyPix)
-        Assertions.assertNotEquals(chavePrePersiste.keyPix,chavePrePersiste.keyValue)
         Assertions.assertNotNull(chavePrePersiste.tipoChave)
         Assertions.assertNotNull(chavePrePersiste.uuid)
         Assertions.assertNotNull(chavePrePersiste.tipoConta)

@@ -1,6 +1,7 @@
 package br.com.zup.enpoint.extensions
 
 import br.com.zup.ChaveRequest
+import br.com.zup.TipoChave
 import br.com.zup.chave.domain.Chave
 import br.com.zup.chave.domain.Client
 import br.com.zup.chave.repository.ChaveRepository
@@ -48,7 +49,8 @@ fun ChaveRequest.notNulls(){
  * @exception GrpcExceptionRuntime lança exceção caso já tenha essa chave cadastrada
  */
 fun ChaveRequest.verificaDuplicidade(chaveRepository: ChaveRepository){
-    if (chaveRepository.existsByKeyPix(this.chave))
+
+    if (chaveRepository.existsByKeyPix(this.chave) && this.tipo!=TipoChave.ALEATORIO)
         throw GrpcExceptionRuntime.alreadyExists("essa chave já foi cadastrada.")
 }
 
@@ -56,15 +58,25 @@ fun ChaveRequest.verificaDuplicidade(chaveRepository: ChaveRepository){
  * Converte os dados da requisição em objeto de dominio
  * @author Marcos Vinicius A. Rocha
  * @param cliente Cliente dono da chave
+ * @param keyRefresh Chave atualizada
  * @exception GrpcExceptionRuntime lança exceção caso tenha algum erro de validação
  * @return retorna um objeto Chave
  */
 fun ChaveRequest.toModel(cliente: Client): Chave {
+
     return Chave(client = cliente,
-        keyValue  = this.chave,
+        keyPix  = chave,
         tipoChave = this.tipo,
         tipoConta = this.tipoConta)
 }
+
+fun ChaveRequest.refreshKey(chave: Chave,keyRefresh:String): Chave {
+    return Chave(client = chave.client,
+        keyPix  = keyRefresh,
+        tipoChave = chave.tipoChave,
+        tipoConta = chave.tipoConta)
+}
+
 
 
 

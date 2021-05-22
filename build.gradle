@@ -39,14 +39,17 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:${kotlinVersion}")
     runtimeOnly("ch.qos.logback:logback-classic")
     runtimeOnly("mysql:mysql-connector-java")
-//    testImplementation("org.testcontainers:junit-jupiter")
-//    testImplementation("org.testcontainers:mysql")
-//    testImplementation("org.testcontainers:testcontainers")
     implementation("io.micronaut:micronaut-validation")
     runtimeOnly("com.fasterxml.jackson.module:jackson-module-kotlin")
+    implementation("io.micronaut.xml:micronaut-jackson-xml")
     testImplementation("org.mockito:mockito-core")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.7.0")
+    testImplementation("org.junit.jupiter:junit-jupiter-params:5.1.0")
+    testImplementation("org.mockito:mockito-all:1.10.19")
+   // testImplementation("org.junit.jupiter:junit-jupiter:5.8.0-M1")
     testRuntimeOnly("com.h2database:h2")
     testImplementation("io.micronaut:micronaut-http-client")
+    testImplementation("org.hamcrest:hamcrest-core:2.2")
 }
 
 

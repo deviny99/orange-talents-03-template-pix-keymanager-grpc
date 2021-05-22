@@ -1,6 +1,7 @@
 package br.com.zup.config
 
-import br.com.zup.enpoint.KeyManagerEnpoint
+import br.com.zup.enpoint.KeyManagerDeleteService
+import br.com.zup.enpoint.KeyManagerRegistryService
 import io.grpc.ServerBuilder
 import io.micronaut.context.event.BeanCreatedEvent
 import io.micronaut.context.event.BeanCreatedEventListener
@@ -15,14 +16,17 @@ class ServerBuilderListener : BeanCreatedEventListener<ServerBuilder<*>>{
     private val logger : Logger = LoggerFactory.getLogger(ServerBuilder::class.java)
 
     @field:Inject
-    private lateinit var keyManagerEnpoint: KeyManagerEnpoint
+    private lateinit var keyManagerResgistryService: KeyManagerRegistryService
+    @field:Inject
+    private lateinit var KeyManagerDeleteService: KeyManagerDeleteService
 
     override fun onCreated(event: BeanCreatedEvent<ServerBuilder<*>>): ServerBuilder<*> {
 
         val builder : ServerBuilder<*> = event.bean
         logger.info("subindo servidor GRPC...")
         logger.info("criando endpoints...")
-        builder.addService(this.keyManagerEnpoint)
+        builder.addService(this.keyManagerResgistryService)
+        builder.addService(this.KeyManagerDeleteService)
         logger.info("(KeyManagerEnpoint) UP")
         logger.info("criando interceptador...")
 //        builder.intercept(GrpcExceptionHandleer())

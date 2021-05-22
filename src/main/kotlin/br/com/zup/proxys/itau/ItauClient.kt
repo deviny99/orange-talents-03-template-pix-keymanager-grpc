@@ -1,7 +1,6 @@
 package br.com.zup.proxys.itau
 
 import br.com.zup.TipoConta
-import br.com.zup.config.interceptor.GrpcExceptionRuntime
 import io.micronaut.http.annotation.Get
 import io.micronaut.http.annotation.PathVariable
 import io.micronaut.http.annotation.QueryValue

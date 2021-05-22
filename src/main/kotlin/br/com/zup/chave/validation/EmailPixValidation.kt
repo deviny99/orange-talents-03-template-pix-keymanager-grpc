@@ -10,7 +10,7 @@ open class EmailPixValidation : PixValidation {
         get() = TipoChave.EMAIL.name.trim().toLowerCase()
 
     override val message: String
-        get() = "a chave do tipo ${this.field} está no formato invalido.".trim().toLowerCase()
+        get() = "a chave do tipo ${this.field} esta no formato invalido.".trim().toLowerCase()
 
 
     override fun validate(chave:String,tipoChave: TipoChave): Boolean {

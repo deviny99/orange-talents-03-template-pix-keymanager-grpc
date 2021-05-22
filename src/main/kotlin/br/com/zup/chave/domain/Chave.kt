@@ -2,7 +2,7 @@ package br.com.zup.chave.domain
 
 import br.com.zup.TipoChave
 import br.com.zup.TipoConta
-import br.com.zup.config.interceptor.GrpcExceptionRuntime
+import java.time.LocalDateTime
 import java.util.*
 import javax.persistence.*
 import javax.validation.constraints.Size
@@ -11,7 +11,9 @@ import javax.validation.constraints.Size
 @Table(name = "chaves")
 class Chave(@field:ManyToOne(fetch = FetchType.EAGER,cascade = [CascadeType.PERSIST,CascadeType.MERGE])
             val client: Client,
-            @field:kotlin.jvm.Transient @field:Size(max = 77) val keyValue:String?,
+            @field:Size(max = 77, message = "A chave deve ter no maximo 77 caracteres")
+            @field:Column(name="keyPix",nullable = false, length = 77)
+            val keyPix:String,
             @Enumerated(EnumType.STRING)
             @field:Column(nullable = false) val tipoChave:TipoChave,
             @Enumerated(EnumType.STRING)
@@ -24,19 +26,4 @@ class Chave(@field:ManyToOne(fetch = FetchType.EAGER,cascade = [CascadeType.PERS
     @Column(nullable = false, updatable = false, unique = true)
     val uuid:String = UUID.randomUUID().toString()
 
-    @field:Column(name="keyPix",nullable = false, length = 77)
-    var keyPix:String
-        private set
-
-    init {
-
-        if(this.tipoChave == TipoChave.ALEATORIO){
-            this.keyPix = UUID.randomUUID().toString()
-        }else
-            if (!keyValue.isNullOrBlank()){
-               this.keyPix = keyValue
-            }else{
-                throw GrpcExceptionRuntime.invalidArgument("A chave não deve ser nula ou vazia", mapOf())
-            }
-    }
 }
