@@ -1,5 +1,6 @@
 package br.com.zup.config.interceptor
 
+import br.com.zup.config.interceptor.handler.ErrorHandlerDelete
 import br.com.zup.enpoint.KeyManagerDeleteService
 import io.micronaut.aop.InterceptorBean
 import javax.inject.Singleton

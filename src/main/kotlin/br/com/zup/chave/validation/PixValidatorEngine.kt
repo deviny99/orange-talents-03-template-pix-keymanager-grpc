@@ -1,7 +1,7 @@
 package br.com.zup.chave.validation
 
 import br.com.zup.TipoChave
-import br.com.zup.config.interceptor.GrpcExceptionRuntime
+import br.com.zup.config.exception.GrpcExceptionRuntime
 /**
  * Classe responsavel por rodar as validações
  * @param validations Validações do tipo PixValidation

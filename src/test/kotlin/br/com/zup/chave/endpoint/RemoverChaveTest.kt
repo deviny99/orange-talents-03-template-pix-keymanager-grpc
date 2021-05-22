@@ -43,7 +43,7 @@ class RemoverChaveTest(private val grpcClient : KeyManagerDeleteGrpc.KeyManagerD
     lateinit var bcbClient: BcbClient
 
     @Factory
-    class Client{
+    private class Client{
 
         @Singleton
         fun blockingStu(@GrpcChannel(GrpcServerChannel.NAME) channel: ManagedChannel)

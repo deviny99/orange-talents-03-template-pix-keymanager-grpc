@@ -37,7 +37,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 
 @MicronautTest(transactional = false)
-internal class CadastroChaveTest(
+class CadastroChaveTest(
     private val grpcClient : KeyManagerRegistryGrpc.KeyManagerRegistryBlockingStub) {
 
     private val idClienteValido = "2b62dad8-b8a5-11eb-8529-0242ac130003"
@@ -63,7 +63,7 @@ internal class CadastroChaveTest(
     }
 
     @Factory
-    class Clients{
+    private class Clients{
         @Singleton
         fun blockingStub(@GrpcChannel(GrpcServerChannel.NAME) channel: ManagedChannel):
                 KeyManagerRegistryGrpc.KeyManagerRegistryBlockingStub?{

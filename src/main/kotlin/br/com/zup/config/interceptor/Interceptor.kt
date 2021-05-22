@@ -1,5 +1,6 @@
 package br.com.zup.config.interceptor
 
+import br.com.zup.config.exception.GrpcExceptionRuntime
 import com.google.rpc.BadRequest
 import com.google.rpc.Code
 import io.grpc.Status

@@ -6,12 +6,50 @@ option java_outer_classname = "KeyManager";
 
 package br.com.zup;
 
+import "google/protobuf/timestamp.proto";
+
 service KeyManagerRegistry {
   rpc cadastrarChave (ChaveRequest) returns (ChaveResponse) {}
 }
 
 service KeyManagerDelete{
   rpc removerChave (ClienteChaveRequest) returns (ChaveRemovidaResponse) {}
+}
+
+service KeyManagerSearch{
+  rpc buscaInterna (PixRequestInterno) returns (PixDetalhes) {}
+  rpc buscaExterna (PixRequestExterno) returns (PixDetalhes) {}
+}
+
+message PixRequestExterno{
+  string pix = 1;
+}
+
+message PixRequestInterno{
+  string pixId = 1;
+  string clienteId = 2;
+}
+
+message PixDetalhes{
+  string pixId = 1;
+  string clienteId = 2;
+  TipoChave tipoChave = 3;
+  string pixValue = 4;
+  Titular titular = 5;
+  Instituicao instituicao = 6;
+  google.protobuf.Timestamp createdAt = 7;
+}
+
+message Instituicao{
+  string nome = 1;
+  string agencia = 2;
+  string numero = 3;
+  TipoConta tipoConta = 4;
+}
+
+message Titular{
+  string nome = 1;
+  string cpf = 2;
 }
 
 enum TipoChave{

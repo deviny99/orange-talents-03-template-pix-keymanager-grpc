@@ -6,7 +6,7 @@ import br.com.zup.chave.domain.Chave
 import br.com.zup.chave.domain.Client
 import br.com.zup.chave.repository.ChaveRepository
 import br.com.zup.chave.validation.PixValidatorEngine
-import br.com.zup.config.interceptor.GrpcExceptionRuntime
+import br.com.zup.config.exception.GrpcExceptionRuntime
 import java.util.*
 
 /**

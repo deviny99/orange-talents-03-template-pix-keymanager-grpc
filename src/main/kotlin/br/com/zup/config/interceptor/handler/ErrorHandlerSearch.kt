@@ -1,4 +1,4 @@
-package br.com.zup.config.interceptor
+package br.com.zup.config.interceptor.handler
 
 import io.micronaut.aop.Around
 
@@ -6,5 +6,5 @@ import io.micronaut.aop.Around
 @Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION)
 @Retention(AnnotationRetention.RUNTIME)
 @MustBeDocumented
-annotation class ErrorHandler
+annotation class ErrorHandlerSearch
 

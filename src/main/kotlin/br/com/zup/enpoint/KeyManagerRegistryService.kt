@@ -6,7 +6,7 @@ import br.com.zup.KeyManagerRegistryGrpc
 import br.com.zup.chave.repository.ChaveRepository
 import br.com.zup.chave.validation.PixValidation
 import br.com.zup.chave.validation.PixValidatorEngine
-import br.com.zup.config.interceptor.ErrorHandler
+import br.com.zup.config.interceptor.handler.ErrorHandlerRegistry
 import br.com.zup.enpoint.extensions.notNulls
 import br.com.zup.enpoint.extensions.validarChavePix
 import br.com.zup.enpoint.extensions.verificaDuplicidade
@@ -19,7 +19,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-@ErrorHandler
+@ErrorHandlerRegistry
 open class KeyManagerRegistryService(
     @field:Inject private val chaveRepository: ChaveRepository,
     @field:Inject private val validations:Set<PixValidation>,

@@ -4,7 +4,7 @@ import br.com.zup.ChaveRequest
 import br.com.zup.chave.repository.ChaveRepository
 import br.com.zup.chave.repository.ClientRepository
 import br.com.zup.chave.repository.extensions.registrarChaveBcb
-import br.com.zup.config.interceptor.GrpcExceptionRuntime
+import br.com.zup.config.exception.GrpcExceptionRuntime
 import br.com.zup.proxys.bcb.BcbClient
 import br.com.zup.proxys.itau.ItauClient
 import javax.inject.Inject

@@ -1,9 +1,10 @@
 package br.com.zup.proxys.bcb
 
 import br.com.zup.proxys.bcb.dto.request.CreatePixKeyRequestProxy
-import br.com.zup.proxys.bcb.dto.response.CreatePixKeyResponse
 import br.com.zup.proxys.bcb.dto.request.DeleteChavePixRequestProxy
+import br.com.zup.proxys.bcb.dto.response.CreatePixKeyResponse
 import br.com.zup.proxys.bcb.dto.response.DeletePixKeyResponse
+import br.com.zup.proxys.bcb.dto.response.PixDetailsResponse
 import io.micronaut.http.MediaType
 import io.micronaut.http.annotation.*
 import io.micronaut.http.client.annotation.Client
@@ -28,5 +29,11 @@ interface BcbClient {
     @Produces(MediaType.APPLICATION_XML)
     fun deletarChavePix(@PathVariable("key") key: String, @Body deleteChavePixRequestProxy: DeleteChavePixRequestProxy)
     : DeletePixKeyResponse?
+
+    @Get(value = "pix/keys/{key}")
+    @Consumes(MediaType.APPLICATION_XML)
+    @Produces(MediaType.APPLICATION_XML)
+    fun consultarDetalhesPix(@PathVariable("key") key:String):PixDetailsResponse?
+
 
 }

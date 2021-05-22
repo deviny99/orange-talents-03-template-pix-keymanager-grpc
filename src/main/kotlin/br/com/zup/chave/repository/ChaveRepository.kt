@@ -12,4 +12,6 @@ interface ChaveRepository : JpaRepository<Chave,Long> {
 
     fun findByKeyPix(chave:String):Optional<Chave>
 
+    fun findByUuid(uuid:String):Optional<Chave>
+
 }

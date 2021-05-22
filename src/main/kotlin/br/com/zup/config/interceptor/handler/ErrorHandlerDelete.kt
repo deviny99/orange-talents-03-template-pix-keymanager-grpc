@@ -1,4 +1,4 @@
-package br.com.zup.config.interceptor
+package br.com.zup.config.interceptor.handler
 
 import io.micronaut.aop.Around
 

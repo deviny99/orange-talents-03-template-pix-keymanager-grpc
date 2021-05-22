@@ -4,8 +4,8 @@ import br.com.zup.ChaveRemovidaResponse
 import br.com.zup.ClienteChaveRequest
 import br.com.zup.KeyManagerDeleteGrpc
 import br.com.zup.chave.repository.ChaveRepository
-import br.com.zup.config.interceptor.ErrorHandlerDelete
-import br.com.zup.config.interceptor.GrpcExceptionRuntime
+import br.com.zup.config.interceptor.handler.ErrorHandlerDelete
+import br.com.zup.config.exception.GrpcExceptionRuntime
 import br.com.zup.enpoint.extensions.notNulls
 import br.com.zup.enpoint.extensions.retornarChave
 import br.com.zup.enpoint.extensions.verificaDonoChave
@@ -35,8 +35,8 @@ open class KeyManagerDeleteService(@field:Inject private val chaveRepository: Ch
 
             this.chaveRepository.deleteById(pix.id!!)
 
-           val response = bcbClient.deletarChavePix(pix.keyPix, DeleteChavePixRequestProxy(pix.keyPix,pix.client.instituicao.ispb))
-                ?:throw GrpcExceptionRuntime.notFound("Não foi possivel ")
+           bcbClient.deletarChavePix(pix.keyPix, DeleteChavePixRequestProxy(pix.keyPix,pix.client.instituicao.ispb))
+                ?:throw GrpcExceptionRuntime.notFound("Não possivel remover a chave informada, pois não está cadastrada")
 
         }
 

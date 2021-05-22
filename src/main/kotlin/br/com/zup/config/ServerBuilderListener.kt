@@ -2,6 +2,7 @@ package br.com.zup.config
 
 import br.com.zup.enpoint.KeyManagerDeleteService
 import br.com.zup.enpoint.KeyManagerRegistryService
+import br.com.zup.enpoint.KeyManagerSearchService
 import io.grpc.ServerBuilder
 import io.micronaut.context.event.BeanCreatedEvent
 import io.micronaut.context.event.BeanCreatedEventListener
@@ -18,7 +19,9 @@ class ServerBuilderListener : BeanCreatedEventListener<ServerBuilder<*>>{
     @field:Inject
     private lateinit var keyManagerResgistryService: KeyManagerRegistryService
     @field:Inject
-    private lateinit var KeyManagerDeleteService: KeyManagerDeleteService
+    private lateinit var keyManagerDeleteService: KeyManagerDeleteService
+    @field:Inject
+    private lateinit var keyManagerSearchService: KeyManagerSearchService
 
     override fun onCreated(event: BeanCreatedEvent<ServerBuilder<*>>): ServerBuilder<*> {
 
@@ -26,7 +29,8 @@ class ServerBuilderListener : BeanCreatedEventListener<ServerBuilder<*>>{
         logger.info("subindo servidor GRPC...")
         logger.info("criando endpoints...")
         builder.addService(this.keyManagerResgistryService)
-        builder.addService(this.KeyManagerDeleteService)
+        builder.addService(this.keyManagerDeleteService)
+        builder.addService(this.keyManagerSearchService)
         logger.info("(KeyManagerEnpoint) UP")
         logger.info("criando interceptador...")
 //        builder.intercept(GrpcExceptionHandleer())

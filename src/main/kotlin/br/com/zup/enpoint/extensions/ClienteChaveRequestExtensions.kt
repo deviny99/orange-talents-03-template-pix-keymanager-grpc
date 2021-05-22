@@ -3,7 +3,7 @@ package br.com.zup.enpoint.extensions
 import br.com.zup.ClienteChaveRequest
 import br.com.zup.chave.domain.Chave
 import br.com.zup.chave.repository.ChaveRepository
-import br.com.zup.config.interceptor.GrpcExceptionRuntime
+import br.com.zup.config.exception.GrpcExceptionRuntime
 
 /**
  * Valida os campos que não podem ser nulos
