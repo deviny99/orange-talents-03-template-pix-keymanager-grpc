@@ -67,7 +67,6 @@ interface Interceptor<M,V> : MethodInterceptor<M,V> {
             .addAllFieldViolations(e.fieldsErrors?.let { convertFildViolations(it) })
             .build()
 
-        println(e.fieldsErrors?.let { this.convertFildViolations(it) })
 
         val status = com.google.rpc.Status.newBuilder()
             .setCode(e.status.code.value())

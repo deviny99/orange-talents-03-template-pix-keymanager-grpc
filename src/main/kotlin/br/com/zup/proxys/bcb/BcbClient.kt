@@ -9,8 +9,7 @@ import io.micronaut.http.MediaType
 import io.micronaut.http.annotation.*
 import io.micronaut.http.client.annotation.Client
 
-
-@Client("http://localhost:8082/api/v1")
+@Client("\${proxy.client.bcb}")
 interface BcbClient {
 
     /**

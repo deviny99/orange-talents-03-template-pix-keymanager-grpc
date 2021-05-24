@@ -16,10 +16,7 @@ open class CpfPixValidation : PixValidation {
         if (tipoChave!=TipoChave.CPF){
             return true
         }
-
-        return chave.replace(".","")
-            .replace("-","")
-            .toLowerCase()
-            .matches(Regex("^[0-9]{11}\$"))
+        return chave.matches(Regex("[0-9]{3}\\.[0-9]{3}\\.[0-9]{3}\\-[0-9]{2}"))
+       // return chave.matches(Regex("^[0-9]{11}\$"))
     }
 }

@@ -2,6 +2,7 @@ package br.com.zup.chave.domain
 
 import br.com.zup.TipoChave
 import br.com.zup.TipoConta
+import java.time.LocalDateTime
 import java.util.*
 import javax.persistence.*
 import javax.validation.constraints.Size
@@ -24,5 +25,8 @@ class Chave(@field:ManyToOne(fetch = FetchType.EAGER,cascade = [CascadeType.PERS
     private set
     @Column(nullable = false, updatable = false, unique = true)
     val uuid:String = UUID.randomUUID().toString()
+    @Column(nullable = false, updatable = false)
+    val createdAt:LocalDateTime = LocalDateTime.now()
+
 
 }

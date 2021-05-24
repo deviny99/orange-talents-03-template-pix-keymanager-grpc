@@ -3,14 +3,13 @@ package br.com.zup.proxys.bcb.dto.response
 import br.com.zup.Instituicao
 import br.com.zup.PixDetalhes
 import br.com.zup.Titular
+import br.com.zup.enpoint.extensions.toGrpcTimestamp
 import br.com.zup.proxys.bcb.dto.BankAccount
 import br.com.zup.proxys.bcb.dto.KeyTypeProxy
 import br.com.zup.proxys.bcb.dto.Owner
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.google.protobuf.Timestamp
 import io.micronaut.core.annotation.Introspected
 import java.time.LocalDateTime
-import java.time.ZoneId
 
 @Introspected
 data class PixDetailsResponse(@JsonProperty("keyType") val keyType:KeyTypeProxy,
@@ -58,11 +57,6 @@ data class PixDetailsResponse(@JsonProperty("keyType") val keyType:KeyTypeProxy,
             .build()
     }
 
-    fun LocalDateTime.toGrpcTimestamp(): Timestamp {
-        val instant = this.atZone(ZoneId.of("UTC")).toInstant()
-        return Timestamp.newBuilder()
-            .setSeconds(instant.epochSecond)
-            .setNanos(instant.nano)
-            .build()
-    }
+
 }
+

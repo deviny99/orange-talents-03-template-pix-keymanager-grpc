@@ -17,9 +17,7 @@ open class CelularPixValidation:PixValidation {
             return true
         }
 
-
-        return chave.replace("-","")
-            .replace("(","")
-            .replace(")","").toLowerCase().matches(Regex("^\\+[1-9][0-9]\\d{1,14}\$"))
+        return chave.toLowerCase().matches(Regex("^\\+[1-9}]{2}\\([1-9]{2}\\)(9[1-9])[0-9]{3}\\-[0-9]{4}\$"))
+        //return chave.toLowerCase().matches(Regex("^\\+[1-9][0-9]\\d{1,14}\$"))
     }
 }

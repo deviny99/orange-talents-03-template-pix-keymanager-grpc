@@ -1,6 +1,7 @@
 package br.com.zup.chave.repository
 
 import br.com.zup.chave.domain.Chave
+import br.com.zup.chave.domain.Client
 import io.micronaut.data.annotation.Repository
 import io.micronaut.data.jpa.repository.JpaRepository
 import java.util.*
@@ -14,4 +15,8 @@ interface ChaveRepository : JpaRepository<Chave,Long> {
 
     fun findByUuid(uuid:String):Optional<Chave>
 
+    fun findByClient(client:Client):List<Chave>
+
 }
+
+

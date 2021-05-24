@@ -4,16 +4,16 @@ micronaut:
 
 grpc:
   server:
-    port: 55051
+    port: ${PORT_GRPC:55051}
     keep-alive-time: 3h
     max-inbound-message-size: 1024
 
 datasources:
   default:
-    url: jdbc:mysql://localhost:3306/keyManager?createDatabaseIfNotExist=true&useTimezone=true&serverTimezone=America/Sao_Paulo
+    url: jdbc:mysql://${DATASOURCE_URL:`localhost:3306`}/keyManager?createDatabaseIfNotExist=true&useTimezone=true&serverTimezone=America/Sao_Paulo
     driverClassName: com.mysql.cj.jdbc.Driver
-    username: root
-    password: root
+    username: ${DATASOURCE_USERNAME:`root`}
+    password: ${DATASOURCE_USERNAME:`root`}
     dialect: MYSQL
 
 jpa:
@@ -22,4 +22,7 @@ jpa:
       hibernate:
         hbm2ddl.auto: update
 
-
+proxy:
+  client:
+    itau:  ${ITAU_PROXY_URL:`http://localhost:9091/api/v1`}
+    bcb: ${BCB_PROXY_URL:`http://localhost:8082/api/v1`}

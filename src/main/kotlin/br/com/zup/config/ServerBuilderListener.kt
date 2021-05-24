@@ -1,6 +1,7 @@
 package br.com.zup.config
 
 import br.com.zup.enpoint.KeyManagerDeleteService
+import br.com.zup.enpoint.KeyManagerListService
 import br.com.zup.enpoint.KeyManagerRegistryService
 import br.com.zup.enpoint.KeyManagerSearchService
 import io.grpc.ServerBuilder
@@ -22,20 +23,24 @@ class ServerBuilderListener : BeanCreatedEventListener<ServerBuilder<*>>{
     private lateinit var keyManagerDeleteService: KeyManagerDeleteService
     @field:Inject
     private lateinit var keyManagerSearchService: KeyManagerSearchService
+    @field:Inject
+    private lateinit var keyManagerListService: KeyManagerListService
 
     override fun onCreated(event: BeanCreatedEvent<ServerBuilder<*>>): ServerBuilder<*> {
 
         val builder : ServerBuilder<*> = event.bean
-        logger.info("subindo servidor GRPC...")
-        logger.info("criando endpoints...")
+        logger.info("Subindo servidor GRPC...")
+        logger.info("Subindo endpoints...")
         builder.addService(this.keyManagerResgistryService)
+        logger.info("(KeyManagerRegistryService) UP")
         builder.addService(this.keyManagerDeleteService)
+        logger.info("(KeyManagerDeleteService) UP")
         builder.addService(this.keyManagerSearchService)
-        logger.info("(KeyManagerEnpoint) UP")
-        logger.info("criando interceptador...")
-//        builder.intercept(GrpcExceptionHandleer())
-//       builder.intercept(GrpcExceptionHandler())
-        logger.info("Interceptador criado")
+        logger.info("(KeyManagerSearchService) UP")
+        builder.addService(this.keyManagerListService)
+        logger.info("(KeyManagerListService) UP")
+        logger.info("Subindo interceptador...")
+        logger.info("Interceptador UP")
         builder.maxInboundMessageSize(1024)
         logger.info("Servidor GRPC Running...")
         return builder

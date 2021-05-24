@@ -6,7 +6,7 @@ import io.micronaut.http.annotation.PathVariable
 import io.micronaut.http.annotation.QueryValue
 import io.micronaut.http.client.annotation.Client
 
-@Client(value = "http://localhost:9091/api/v1")
+@Client("\${proxy.client.itau}")
 interface ItauClient {
 
     /**
@@ -17,6 +17,9 @@ interface ItauClient {
      * @return Retorna um objeto do tipo ClienteProxyResponse(pode retornar um null)
      */
     @Get(value = "/clientes/{clienteId}/contas")
-    fun consultarClient(@PathVariable("clienteId") id:String,@QueryValue("tipo") tipoConta: TipoConta) : ClienteProxyResponse?
+    fun consultarClient(@PathVariable("clienteId") id:String,@QueryValue("tipo") tipoConta: TipoConta)
+    : ClienteProxyResponse?
 
+    @Get(value = "/clientes/{clienteId}")
+    fun consultarClient(@PathVariable("clienteId") id:String) : DadosClienteProxyResponse?
 }

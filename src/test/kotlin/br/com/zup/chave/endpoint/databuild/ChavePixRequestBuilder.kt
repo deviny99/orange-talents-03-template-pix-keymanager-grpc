@@ -4,7 +4,6 @@ package br.com.zup.chave.endpoint.databuild
 import br.com.zup.PixRequestExterno
 import br.com.zup.PixRequestInterno
 import br.com.zup.chave.domain.Chave
-import java.util.*
 
 class ChavePixRequestBuilder {
 

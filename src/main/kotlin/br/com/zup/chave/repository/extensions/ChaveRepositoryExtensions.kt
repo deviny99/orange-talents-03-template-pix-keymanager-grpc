@@ -28,7 +28,9 @@ fun ChaveRepository.registrarChaveBcb(request: ChaveRequest,
     val responseBcb = bcbClient.cadastrarChavePix(CreatePixKeyRequestProxy(chave))
         ?:throw GrpcExceptionRuntime.notFound("Não foi possivel registrar a chave")
 
-    logger.info("Chave registrada :) ás ${responseBcb.createdAt.format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss"))}")
+    logger.info("Chave registrada :) ás ${responseBcb.createdAt
+        .format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss"))}")
     logger.info("Atualizando as chave e salvando no banco de dados...")
     return this.save(request.refreshKey(chave,responseBcb.key)).uuid
 }
+

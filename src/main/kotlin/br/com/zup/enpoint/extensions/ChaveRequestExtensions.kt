@@ -65,7 +65,7 @@ fun ChaveRequest.verificaDuplicidade(chaveRepository: ChaveRepository){
 fun ChaveRequest.toModel(cliente: Client): Chave {
 
     return Chave(client = cliente,
-        keyPix  = chave,
+        keyPix  = this.chave,
         tipoChave = this.tipo,
         tipoConta = this.tipoConta)
 }

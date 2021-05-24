@@ -12,13 +12,34 @@ service KeyManagerRegistry {
   rpc cadastrarChave (ChaveRequest) returns (ChaveResponse) {}
 }
 
-service KeyManagerDelete{
+service KeyManagerDelete {
   rpc removerChave (ClienteChaveRequest) returns (ChaveRemovidaResponse) {}
 }
 
-service KeyManagerSearch{
+service KeyManagerSearch {
   rpc buscaInterna (PixRequestInterno) returns (PixDetalhes) {}
   rpc buscaExterna (PixRequestExterno) returns (PixDetalhes) {}
+}
+
+service KeyManagerListKeys{
+  rpc listagemChaves (ClienteRequest) returns (ListaPix) {}
+}
+
+message PixDetalhesLista{
+  string pixID = 1;
+  string clienteId = 2;
+  TipoChave tipoChave = 3;
+  string pixValue = 4;
+  TipoConta tipoConta = 5;
+  google.protobuf.Timestamp createdAt = 6;
+}
+
+message ClienteRequest{
+  string clienteId = 1;
+}
+
+message ListaPix{
+  repeated PixDetalhesLista chaves = 1;
 }
 
 message PixRequestExterno{
