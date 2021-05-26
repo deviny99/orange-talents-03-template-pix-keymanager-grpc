@@ -72,7 +72,7 @@ class DetalhesPixTest(private val grpcClient:KeyManagerSearchGrpc.KeyManagerSear
 
         Assertions.assertEquals(1,this.chaveRepository.count())
         this.retornarPixBcbMock()
-        val response = this.grpcClient.buscaInterna(ChavePixRequestBuilder.requestInternoPixAleatorioValido(chave))
+        val response = this.grpcClient.consultarChave(ChavePixRequestBuilder.requestInternoPixAleatorioValido(chave))
 
         Assertions.assertNotNull(response)
         Assertions.assertEquals(1,this.chaveRepository.count())
@@ -81,7 +81,7 @@ class DetalhesPixTest(private val grpcClient:KeyManagerSearchGrpc.KeyManagerSear
     @Test
     fun `Deve retornar Pix Externo`(){
         this.retornarPixBcbMock()
-        val response = this.grpcClient.buscaExterna(ChavePixRequestBuilder.requestExternoPixAleatorioValido())
+        val response = this.grpcClient.consultarChave(ChavePixRequestBuilder.requestExternoPixAleatorioValido())
 
         Assertions.assertNotNull(response)
         Assertions.assertEquals(1,this.chaveRepository.count())
@@ -94,11 +94,11 @@ class DetalhesPixTest(private val grpcClient:KeyManagerSearchGrpc.KeyManagerSear
         this.retornarNotFoundPixBcbMock()
 
         val throws = assertThrows<StatusRuntimeException> {
-            this.grpcClient.buscaInterna(ChavePixRequestBuilder.requestInternoPixAleatorioValido(chave))
+            this.grpcClient.consultarChave(ChavePixRequestBuilder.requestInternoPixAleatorioValido(chave))
         }
 
         with(throws){
-            Assertions.assertEquals(Status.NOT_FOUND.code,throws.status.code)
+            Assertions.assertEquals(Status.NOT_FOUND.code,status.code)
             Assertions.assertEquals("NOT_FOUND: A chave inserida nao esta cadastrada como uma chave PIX",
                 throws.localizedMessage)
         }
@@ -110,11 +110,11 @@ class DetalhesPixTest(private val grpcClient:KeyManagerSearchGrpc.KeyManagerSear
         this.retornarNotFoundPixBcbMock()
 
         val throws = assertThrows<StatusRuntimeException> {
-            this.grpcClient.buscaExterna(ChavePixRequestBuilder.requestExternoPixAleatorioValido())
+            this.grpcClient.consultarChave(ChavePixRequestBuilder.requestExternoPixAleatorioValido())
         }
 
         with(throws){
-            Assertions.assertEquals(Status.NOT_FOUND.code,throws.status.code)
+            Assertions.assertEquals(Status.NOT_FOUND.code,status.code)
             Assertions.assertEquals("NOT_FOUND: A chave inserida nao esta cadastrada como uma chave PIX",
                 throws.localizedMessage)
         }
@@ -126,12 +126,12 @@ class DetalhesPixTest(private val grpcClient:KeyManagerSearchGrpc.KeyManagerSear
         this.retornarNotFoundPixBcbMock()
 
         val throws = assertThrows<StatusRuntimeException> {
-            this.grpcClient.buscaExterna(ChavePixRequestBuilder.requestExternoPixAleatorioNulo())
+            this.grpcClient.consultarChave(ChavePixRequestBuilder.requestExternoPixAleatorioNulo())
         }
 
         with(throws){
-            Assertions.assertEquals(Status.INVALID_ARGUMENT.code,throws.status.code)
-            Assertions.assertEquals("INVALID_ARGUMENT: A chave inserida nao pode ser nula ou vazia",
+            Assertions.assertEquals(Status.INVALID_ARGUMENT.code,status.code)
+            Assertions.assertEquals("INVALID_ARGUMENT: A chave inserida nao pode ser nula ou vazia.",
                 throws.localizedMessage)
         }
     }
@@ -141,14 +141,14 @@ class DetalhesPixTest(private val grpcClient:KeyManagerSearchGrpc.KeyManagerSear
         this.retornarNotFoundPixBcbMock()
 
         val throws = assertThrows<StatusRuntimeException> {
-            this.grpcClient.buscaInterna(ChavePixRequestBuilder.requestInternoPixAleatorioNulo())
+            this.grpcClient.consultarChave(ChavePixRequestBuilder.requestInternoPixAleatorioNulo())
         }
 
         with(throws){
-            Assertions.assertEquals(Status.INVALID_ARGUMENT.code,throws.status.code)
+            Assertions.assertEquals(Status.INVALID_ARGUMENT.code,status.code)
             assertThat(violations(),containsInAnyOrder(
-                Pair("pixId", "A chave inserida nao pode ser nula ou vazia"),
-                Pair("clienteId", "O id do Cliente nao pode ser nulo ou vazia")
+                Pair("pixId", "Nao pode ser nula ou vazio"),
+                Pair("clienteId", "Nao pode ser nula ou vazio")
             ))
         }
     }

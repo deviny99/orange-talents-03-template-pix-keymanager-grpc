@@ -2,6 +2,7 @@ package br.com.zup.chave.domain
 
 import br.com.zup.TipoChave
 import br.com.zup.TipoConta
+import br.com.zup.config.exception.GrpcExceptionRuntime
 import java.time.LocalDateTime
 import java.util.*
 import javax.persistence.*
@@ -28,5 +29,11 @@ class Chave(@field:ManyToOne(fetch = FetchType.EAGER,cascade = [CascadeType.PERS
     @Column(nullable = false, updatable = false)
     val createdAt:LocalDateTime = LocalDateTime.now()
 
-
+    fun isPertenceAoCliente(clienteId: String ):Boolean{
+        if (this.client.uuid != clienteId){
+            throw GrpcExceptionRuntime.notFound("A chave inserida nao pertence ao cliente informado")
+        }else{
+            return true
+        }
+    }
 }

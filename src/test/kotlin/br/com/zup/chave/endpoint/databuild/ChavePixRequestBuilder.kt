@@ -1,47 +1,57 @@
 package br.com.zup.chave.endpoint.databuild
 
-
-import br.com.zup.PixRequestExterno
-import br.com.zup.PixRequestInterno
+import br.com.zup.PixRequest
 import br.com.zup.chave.domain.Chave
 
 class ChavePixRequestBuilder {
 
     companion object{
 
-        fun requestInternoPixAleatorioValido(chave:Chave):PixRequestInterno{
-            return PixRequestInterno.newBuilder()
-                .setPixId(chave.uuid)
-                .setClienteId(clientIdDefault())
+        fun requestInternoPixAleatorioValido(chave:Chave):PixRequest{
+            return PixRequest.newBuilder()
+                .setPixId(PixRequest
+                    .FiltroPorPixId
+                    .newBuilder()
+                    .setPixId(chave.uuid)
+                    .setClienteId(clientIdDefault()))
                 .build()
         }
 
-        fun requestExternoPixAleatorioValido():PixRequestExterno{
-            return PixRequestExterno.newBuilder()
-                .setPix(pixDefault())
+        fun requestExternoPixAleatorioValido():PixRequest{
+            return PixRequest.newBuilder()
+                .setChave(pixDefault())
                 .build()
         }
 
-        fun requestInternoPixAleatorioNulo():PixRequestInterno{
-            return PixRequestInterno.newBuilder()
+        fun requestInternoPixAleatorioNulo():PixRequest{
+            return PixRequest.newBuilder()
+                .setPixId(PixRequest
+                    .FiltroPorPixId
+                    .newBuilder()
+                    .setPixId("")
+                    .setClienteId(""))
                 .build()
         }
 
-        fun requestExternoPixAleatorioNulo():PixRequestExterno{
-            return PixRequestExterno.newBuilder()
+        fun requestExternoPixAleatorioNulo():PixRequest{
+            return PixRequest.newBuilder()
+                .setChave("")
                 .build()
         }
 
-        fun requestInternoPixAleatorioVazio():PixRequestInterno{
-            return PixRequestInterno.newBuilder()
-                .setPixId("")
-                .setClienteId("")
+        fun requestInternoPixAleatorioVazio():PixRequest{
+            return PixRequest.newBuilder()
+                .setPixId(PixRequest
+                    .FiltroPorPixId
+                    .newBuilder()
+                    .setPixId("")
+                    .setClienteId(clientIdDefault()))
                 .build()
         }
 
-        fun requestExternoPixAleatorioVazio():PixRequestExterno{
-            return PixRequestExterno.newBuilder()
-                .setPix("")
+        fun requestExternoPixAleatorioVazio():PixRequest{
+            return PixRequest.newBuilder()
+                .setChave("")
                 .build()
         }
 

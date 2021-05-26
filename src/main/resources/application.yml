@@ -4,7 +4,7 @@ micronaut:
 
 grpc:
   server:
-    port: ${PORT_GRPC:55051}
+    port: ${PORT_GRPC:55052}
     keep-alive-time: 3h
     max-inbound-message-size: 1024
 
@@ -13,7 +13,7 @@ datasources:
     url: jdbc:mysql://${DATASOURCE_URL:`localhost:3306`}/keyManager?createDatabaseIfNotExist=true&useTimezone=true&serverTimezone=America/Sao_Paulo
     driverClassName: com.mysql.cj.jdbc.Driver
     username: ${DATASOURCE_USERNAME:`root`}
-    password: ${DATASOURCE_USERNAME:`root`}
+    password: ${DATASOURCE_PASSWORD:`root`}
     dialect: MYSQL
 
 jpa:
@@ -26,3 +26,6 @@ proxy:
   client:
     itau:  ${ITAU_PROXY_URL:`http://localhost:9091/api/v1`}
     bcb: ${BCB_PROXY_URL:`http://localhost:8082/api/v1`}
+
+endpoints:
+  health.enabled: true

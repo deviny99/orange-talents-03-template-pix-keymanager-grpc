@@ -17,8 +17,7 @@ service KeyManagerDelete {
 }
 
 service KeyManagerSearch {
-  rpc buscaInterna (PixRequestInterno) returns (PixDetalhes) {}
-  rpc buscaExterna (PixRequestExterno) returns (PixDetalhes) {}
+  rpc consultarChave (PixRequest) returns (PixDetalhes) {}
 }
 
 service KeyManagerListKeys{
@@ -42,24 +41,37 @@ message ListaPix{
   repeated PixDetalhesLista chaves = 1;
 }
 
-message PixRequestExterno{
-  string pix = 1;
-}
-
-message PixRequestInterno{
-  string pixId = 1;
-  string clienteId = 2;
+message PixRequest{
+  message FiltroPorPixId{
+    string pixId = 1;
+    string clienteId = 2;
+  }
+  oneof filtro{
+    FiltroPorPixId pixId = 1;
+    string chave = 2;
+  }
 }
 
 message PixDetalhes{
+
   string pixId = 1;
   string clienteId = 2;
   TipoChave tipoChave = 3;
   string pixValue = 4;
   Titular titular = 5;
-  Instituicao instituicao = 6;
+  InstituicaoInfo instituicao = 6;
   google.protobuf.Timestamp createdAt = 7;
+
+  message InstituicaoInfo{
+    string ispb = 1;
+    string agencia = 2;
+    string numero = 3;
+    TipoConta tipoConta = 4;
+  }
+
 }
+
+
 
 message Instituicao{
   string nome = 1;
@@ -67,6 +79,7 @@ message Instituicao{
   string numero = 3;
   TipoConta tipoConta = 4;
 }
+
 
 message Titular{
   string nome = 1;

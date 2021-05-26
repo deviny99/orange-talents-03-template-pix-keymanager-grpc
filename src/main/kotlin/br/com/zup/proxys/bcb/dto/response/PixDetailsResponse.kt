@@ -1,6 +1,5 @@
 package br.com.zup.proxys.bcb.dto.response
 
-import br.com.zup.Instituicao
 import br.com.zup.PixDetalhes
 import br.com.zup.Titular
 import br.com.zup.enpoint.extensions.toGrpcTimestamp
@@ -19,24 +18,6 @@ data class PixDetailsResponse(@JsonProperty("keyType") val keyType:KeyTypeProxy,
                               @JsonProperty("createdAt") val createdAt:LocalDateTime) {
 
 
-    fun toPixDetalhes():PixDetalhes{
-        return PixDetalhes.newBuilder()
-            .setTipoChave(keyType.tipoChave)
-            .setPixValue(key)
-            .setCreatedAt(createdAt.toGrpcTimestamp())
-            .setTitular(Titular.newBuilder()
-                                .setNome(owner.name)
-                                .setCpf(owner.taxIdNumber)
-                        .build())
-            .setInstituicao(Instituicao.newBuilder()
-                        .setNome(bankAccount.participant)
-                        .setAgencia(bankAccount.branch)
-                        .setNumero(bankAccount.accountNumber)
-                        .setTipoConta(bankAccount.accountType.convertTipoConta())
-                        .build())
-            .build()
-    }
-
     fun toPixDetalhes(pixId:String,clientId:String):PixDetalhes{
         return PixDetalhes.newBuilder()
             .setPixId(pixId)
@@ -48,8 +29,8 @@ data class PixDetailsResponse(@JsonProperty("keyType") val keyType:KeyTypeProxy,
                 .setNome(owner.name)
                 .setCpf(owner.taxIdNumber)
                 .build())
-            .setInstituicao(Instituicao.newBuilder()
-                .setNome(bankAccount.participant)
+            .setInstituicao(PixDetalhes.InstituicaoInfo.newBuilder()
+                .setIspb(bankAccount.participant)
                 .setAgencia(bankAccount.branch)
                 .setNumero(bankAccount.accountNumber)
                 .setTipoConta(bankAccount.accountType.convertTipoConta())
